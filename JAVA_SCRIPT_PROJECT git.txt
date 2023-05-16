@@ -1,0 +1,216 @@
+let SNAKE_DIM = 10;
+let NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3;
+let DELAY = 100;
+let FOOD_DELAY = 6000;
+let FOOD_RADIUS = 5;
+let FOOD_COLOR = Color.blue;
+
+let curDirection = EAST;
+
+let x = getWidth()/2 - SNAKE_DIM/2;
+let y = getHeight()/2 - SNAKE_DIM/2;
+
+let points = 0;
+let pointsText;
+
+let POINTS_TEXT_X = 5;
+let POINTS_TEXT_Y_BUFFER = 5;
+
+
+
+function main(){
+    
+   let isPumped=true;
+   let isSad=false;
+   let isgroovy=false;
+   
+   if (isPumped){
+       pumped();
+   }
+   
+   if (isSad){
+       sad();
+   }
+   
+   if (isgroovy){
+       groovy();
+   }
+   
+    
+    yourInfo();
+    play();
+   
+   
+}
+function pumped(){
+        console.log("You are feeling pumped today, so you will play my new game but first I need to know a little about you");
+        console.log("")
+
+let gameList = ["SNAKE" , "BLUE" , "TURTLE" , "RED"];
+        
+        println(gameList[0]);
+        println(gameList[1]);
+}
+
+function yourInfo(){
+    let name = readLine("What is your name? ");
+    let age = readInt("What is your age? ");
+    let snake = readLine("From the List you are going to play a snake game with blue food. Type Great to continue. ");
+    let preGame = prompt("Before we start in the story game, we will check your luck with another lives based game. Type Great to continue. " );  
+    console.log("")
+
+ play();
+    
+}
+
+function play(msg,){
+    for (let lives = 3; lives > 0; lives--){
+        console.log("Lives left: " + lives);
+        console.log("You try and jump over the lava.");
+        let surviveRound1 = Randomizer.nextBoolean();
+        if (surviveRound1){
+            console.log("You make it! You attempt to climb the mountain.");
+            let surviveRound2 = Randomizer.nextBoolean();
+            if (surviveRound2){
+                console.log("You pull yourself up to the top of the mountain! You attempt to cross the river.");
+                let surviveRound3 = Randomizer.nextBoolean();
+                if (surviveRound3){
+                    console.log("You successfully ford the river! You attempt to cross the desert.");
+                    console.log("You trek for miles across the desert.");
+                    console.log("Despite your efforts, you fall into the never ending pit.");
+                    console.log("You lose a life.");
+                } else {
+                    console.log("Despite your efforts, you fall into the never ending pit.");
+                    console.log("You lose a life");
+                    
+            }
+        }
+    }
+}
+    console.log("OH no You are out of lives. Try again later.")
+    console.log("");
+}
+
+function start(){
+	drawPoints();
+	addPart(x,y);
+	setTimer(move, DELAY);
+	
+	
+	makeFood();
+	setTimer(makeFood, FOOD_DELAY);
+	keyDownMethod(changeDirection);
+	
+
+}
+
+function drawPoints(){
+	pointsText = new Text(points, "17pt Arial");
+	pointsText.setPosition(POINTS_TEXT_X, getHeight() - POINTS_TEXT_Y_BUFFER);
+	add(pointsText);
+}
+
+function makeFood(){
+	let x = Randomizer.nextInt(FOOD_RADIUS, getWidth() - FOOD_RADIUS);
+	let y = Randomizer.nextInt(FOOD_RADIUS, getHeight() - FOOD_RADIUS);
+	
+	x = Math.floor(x / 10) * 10 + 5;
+	y = Math.floor(y / 10) * 10 + 5;
+	
+	let food = new Circle(FOOD_RADIUS);
+	food.isFood = true;
+	food.setColor(Color.blue);
+	food.setPosition(x, y);
+	if(getElementAt(x,y) == null){
+		add(food);	
+	}
+}
+
+function changeDirection(e){
+	if(e.keyCode == Keyboard.DOWN){
+		curDirection = SOUTH;
+	}
+	if(e.keyCode == Keyboard.UP){
+		curDirection = NORTH;
+	}
+	if(e.keyCode == Keyboard.LEFT){
+		curDirection = WEST;
+	}
+	if(e.keyCode == Keyboard.RIGHT){
+		curDirection = EAST;
+	}
+}
+
+function addPart(x,y){
+	let snake = new Rectangle(SNAKE_DIM, SNAKE_DIM);
+	snake.setPosition(x - SNAKE_DIM/2 , y - SNAKE_DIM/2);
+	snake.setColor(Color.red);
+	snake.isSnake = true;
+	add(snake);
+}
+
+function drawMessage(msg){
+	let text = new Text(msg,"23pt Arial");
+	text.setPosition(getWidth()/2 - text.getWidth()/2, getHeight()/2);
+	add(text);
+}
+
+function move(){
+	let nextPosition = getNextPosition();
+	x = nextPosition.x;
+	y = nextPosition.y
+		
+	points++;
+	pointsText.setText(points);
+
+		
+	let nextElem = getElementAt(x, y);
+	if(nextElem == null){
+		addPart(x, y);		
+	}else{
+		if(nextElem.isSnake){
+		    drawMessage("Game Over man, Game Over.");
+			stopTimer(move);
+			stopTimer(makeFood);			
+		}
+		
+		if(nextElem.isFood){
+		    points += 100;
+			pointsText.setText(points);
+
+			remove(nextElem);
+			addPart(x, y);		
+		}		
+	}
+}
+
+
+function getNextPosition(){
+	let nextX = x, nextY = y;
+	
+	if(curDirection == EAST){
+		nextX += SNAKE_DIM;
+	}
+	if(curDirection == WEST){
+		nextX -= SNAKE_DIM;
+	}
+	
+	if(curDirection == SOUTH){
+		nextY += SNAKE_DIM;
+	}
+	
+	if(curDirection == NORTH){
+		nextY -= SNAKE_DIM;
+	}
+	
+	nextX = (nextX + getWidth()) % getWidth();
+	nextY = (nextY + getHeight()) % getHeight();
+	
+	return {
+		x: nextX,
+		y: nextY,
+	};
+}
+
+
+main();
